@@ -1,14 +1,17 @@
 import 'dart:io';
+import 'package:geolocator/geolocator.dart';
 
 class CatItem {
-  //Foto
+
+  final String name;
   final String title;
   final String description;
   final File? image;
   final DateTime dateTime;
-  final String location;
+  final Position? location;
 
   CatItem({
+    required this.name,
     required this.title,
     required this.description,
     required this.image,

@@ -5,9 +5,8 @@ import '../models/cat_item.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'cat_description.dart';
-
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:find_a_cat/components/CatMap.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,9 +17,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final nameCat = TextEditingController();
   final titleCat = TextEditingController();
   final descriptionCat = TextEditingController();
-  final locationCat = TextEditingController();
   ImagePicker imagePicker = ImagePicker();
   File? imageFile;
 
@@ -45,16 +44,16 @@ class _HomePageState extends State<HomePage> {
                       child: Icon(Icons.add),
                   ),
                   TextField(
+                    controller: nameCat,
+                    decoration: const InputDecoration(hintText: 'Nome'),
+                  ),
+                  TextField(
                     controller: titleCat,
                     decoration: const InputDecoration(hintText: 'Título'),
                   ),
                   TextField(
                     controller: descriptionCat,
                     decoration: const InputDecoration(hintText: 'Descrição'),
-                  ),
-                  TextField(
-                    controller: locationCat,
-                    decoration: const InputDecoration(hintText: 'Local'),
                   ),
                 ],
               ),
@@ -65,14 +64,20 @@ class _HomePageState extends State<HomePage> {
             ));
   }
 
-  void save() {
-    CatItem cat = CatItem(
-        title: titleCat.text,
-        description: descriptionCat.text,
-        image: imageFile,
-        dateTime: DateTime.now(),
-        location: locationCat.text);
-    Provider.of<CatData>(context, listen: false).addNewCat(cat);
+  void save() async {
+    final Position? location = await _getCurrentPosition();
+    if (location != null) {
+
+      CatItem cat = CatItem(
+          name: nameCat.text,
+          title: titleCat.text,
+          description: descriptionCat.text,
+          image: imageFile,
+          dateTime: DateTime.now(),
+          location: location
+      );
+      Provider.of<CatData>(context, listen: false).addNewCat(cat);
+    }
     clear();
     Navigator.pop(context);
   }
@@ -83,10 +88,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void clear() {
+    nameCat.clear();
     imageFile = null;
     titleCat.clear();
     descriptionCat.clear();
-    locationCat.clear();
   }
 
   @override
@@ -94,17 +99,34 @@ class _HomePageState extends State<HomePage> {
     return Consumer<CatData>(
       builder: (context, value, child) => Scaffold(
           backgroundColor: Colors.grey[300],
-          floatingActionButton: FloatingActionButton(
+          floatingActionButton:
+          Row(
+              children: [
+                SizedBox(width: 140),
+                FloatingActionButton(
             onPressed: addNewCat,
-            backgroundColor: Colors.green[300],
+            backgroundColor: Colors.blue[300],
             child: Icon(Icons.add),
+          ),
+                SizedBox(width: 16),
+                FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CatMap(catData: Provider.of<CatData>(context).getAllCatsList()),
+                  ),
+                ); },
+                  backgroundColor: Colors.green[300],
+                child: Icon(Icons.map),
+               ),
+                ],
           ),
           body:
               ListView.builder(
                 itemCount: value.getAllCatsList().length,
                 itemBuilder: (context, index) => ListTile(
-                  title: Text('${value.getAllCatsList()[index].title} , '
-                      '${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime)}'),
+                  title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime)}'),
                   onTap: () async {
                     late Widget page = CatDescription(index: index);
                     String retorno = "";
@@ -146,6 +168,19 @@ class _HomePageState extends State<HomePage> {
           MaterialPageRoute(builder: (BuildContext context) {
             return page;
           }));
+    }
+  }
+
+  Future <Position?> _getCurrentPosition() async {
+    try {
+      final Position? position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high,);
+      if (position != null) {
+          return position;
+      } else {
+        print("Posição não disponível");
+      }
+    } catch (e) {
+      print('Erro ao obter a posição: $e');
     }
   }
 }
