@@ -50,8 +50,8 @@ class _CatMapState extends State<CatMap> {
                   MarkerLayer(
                     markers: widget.catData.map((cat) {
                       return Marker(
-                        point: cat.location?.latitude != null && cat.location?.longitude != null
-                            ? LatLng(cat.location!.latitude, cat.location!.longitude)
+                        point: cat.latitude != null && cat.longitude != null
+                            ? LatLng(cat.latitude, cat.longitude)
                             : LatLng(0, 0),
                         width: 20,
                         height: 20,
