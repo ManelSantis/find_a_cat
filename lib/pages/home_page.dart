@@ -71,7 +71,21 @@ class _HomePageState extends State<HomePage> {
   void save() async {
     final Position? location = await _getCurrentPosition();
     if (location != null) {
-      createCat(nameCat.text, titleCat.text, descriptionCat.text, DateTime.now(), 123, location.latitude, location.longitude);
+      try {
+        final cat = await createCat(
+            nameCat.text,
+            titleCat.text,
+            descriptionCat.text,
+            DateTime.now(),
+            123,
+            location.latitude,
+            location.longitude);
+
+        Provider.of<CatData>(context, listen: false).addNewCat(cat);
+      } catch (e) {
+        // Lide com erros ao criar o gato
+        print('Erro ao criar o gato: $e');
+      }
     }
     clear();
     Navigator.pop(context);
@@ -118,24 +132,6 @@ class _HomePageState extends State<HomePage> {
                 ],
           ),
           body:
-// <<<<<<< HEAD
-//               ListView.builder(
-//                 itemCount: value.getAllCatsList().length,
-//                 itemBuilder: (context, index) => ListTile(
-//                   title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime!)}'),
-//                   onTap: () async {
-//                     late Widget page = CatDescription(index: index);
-//                     String retorno = "";
-//                     try {
-//                       retorno = await push(context, page);
-//                     } catch (error) {
-//                       print(retorno);
-//                     }
-//                   },
-//                 ),
-//               ),
-//            ),
-// =======
           FutureBuilder<List<CatItem>>(
             future: fetchCatList(),
             builder: (context, snapshot) {
@@ -167,7 +163,6 @@ class _HomePageState extends State<HomePage> {
             },
           ),
       ),
-// >>>>>>> 9a86b985cdfc277cee9e1339180be552bb20c051
     );
   }
 
@@ -214,16 +209,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> createCat(String name, String title, String description, DateTime dateTime, int image, double latitude, double longitude) async {
+  Future<CatItem> createCat (String name, String title, String description, DateTime dateTime, int image, double latitude, double longitude) async {
     try {
-      final uri = Uri.parse("http://192.168.1.5:8080/cat/create");
-      // final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
+      //final uri = Uri.parse("http://192.168.1.5:8080/cat/create");
+      final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
       final String formattedDateTime = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime);
 
       final token = await getToken();
       final username = await getUsername();
-      final userUri = Uri.parse("http://192.168.1.5:8080/user/username/$username");
-      // final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
+      //final userUri = Uri.parse("http://192.168.1.5:8080/user/username/$username");
+      final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
       final responseUser = await http.get(userUri, headers: {'content-type': "application/json", 'authorization': "Bearer $token"});
 
       if (responseUser.statusCode == 200) {
@@ -255,9 +250,8 @@ class _HomePageState extends State<HomePage> {
           debugPrint(response.body);
           Map<String, dynamic> jsonData = json.decode(response.body.toString());
           debugPrint(jsonData.toString());
-          CatItem catitem = CatItem.fromJson(jsonData);
-          print(catitem.id??0);
-          //CatItem.createCat(json.decode(response.body));
+          CatItem cat = CatItem.fromJson(jsonData);
+          return cat;
         } else {
           throw Exception('Falha ao criar o gato');
         }
@@ -265,13 +259,14 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Falha ao obter os dados do usuário');
       }
     } catch (e, stackTrace) {
-      print('Erro: $e');
-      print('Stack Trace: $stackTrace');
+      throw('Erro: $e');
     }
+
   }
 
   Future<List<CatItem>> fetchCatList() async {
-    final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+    //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+    final uri = Uri.parse("http://172.23.96.1:8080/cat/paged");
 
     try {
       final token = await getToken();
@@ -284,7 +279,6 @@ class _HomePageState extends State<HomePage> {
         if (response.body != null && response.body.isNotEmpty) {
           final Map<String, dynamic> jsonBody = json.decode(response.body);
           final List<dynamic> catJsonList = jsonBody['content'] as List<dynamic>;
-          print(catJsonList.toString());
           final List<CatItem> catList = catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
 
           return catList;
@@ -299,6 +293,7 @@ class _HomePageState extends State<HomePage> {
       print('Stack Trace: $stackTrace');
       throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
     }
+
   }
 
   Future<String?> getToken() async {

@@ -102,8 +102,8 @@ class _SigninState extends State<Signin> {
 
   Future<String?> login(String username, String password) async {
     // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-    final uri = Uri.parse("http://192.168.1.5:8080/auth/login");
-    // final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
+    //final uri = Uri.parse("http://192.168.1.5:8080/auth/login");
+    final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
     final Map<String, dynamic> request = {
       'username': username,
       'password': password,
