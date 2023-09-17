@@ -37,4 +37,20 @@ class CatItem {
       longitude: json['longitude'],
       user: json['user']
   );
+
+  factory CatItem.fromJson( Map<String, dynamic> json) {
+    return CatItem(
+        id: json['id'],
+        name: json['name'],
+        title: json['title'],
+        description: json['description'],
+        image: json['picture'],
+        dateTime: json['date'],
+        latitude: json['latitude'],
+        longitude: json['longitude'],
+        user: json['user']
+    );
+  }
+
+
 }
