@@ -118,22 +118,56 @@ class _HomePageState extends State<HomePage> {
                 ],
           ),
           body:
-              ListView.builder(
-                itemCount: value.getAllCatsList().length,
-                itemBuilder: (context, index) => ListTile(
-                  title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime!)}'),
-                  onTap: () async {
-                    late Widget page = CatDescription(index: index);
-                    String retorno = "";
-                    try {
-                      retorno = await push(context, page);
-                    } catch (error) {
-                      print(retorno);
-                    }
-                  },
-                ),
-              ),
-           ),
+// <<<<<<< HEAD
+//               ListView.builder(
+//                 itemCount: value.getAllCatsList().length,
+//                 itemBuilder: (context, index) => ListTile(
+//                   title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime!)}'),
+//                   onTap: () async {
+//                     late Widget page = CatDescription(index: index);
+//                     String retorno = "";
+//                     try {
+//                       retorno = await push(context, page);
+//                     } catch (error) {
+//                       print(retorno);
+//                     }
+//                   },
+//                 ),
+//               ),
+//            ),
+// =======
+          FutureBuilder<List<CatItem>>(
+            future: fetchCatList(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator(); // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
+              } else if (snapshot.hasError) {
+                return Text('Erro: ${snapshot.error}');
+              } else if (!snapshot.hasData) {
+                return Text('Nenhum dado disponível');
+              } else {
+                final catList = snapshot.data!;
+
+                return ListView.builder(
+                  itemCount: catList.length,
+                  itemBuilder: (context, index) => ListTile(
+                    title: Text('${catList[index].title} , ${value.convertDateTimeToString(catList[index].dateTime!)}'),
+                    onTap: () async {
+                      late Widget page = CatDescription(index: index);
+                      String retorno = "";
+                      try {
+                        retorno = await push(context, page);
+                      } catch (error) {
+                        print(retorno);
+                      }
+                    },
+                  ),
+                );
+              }
+            },
+          ),
+      ),
+// >>>>>>> 9a86b985cdfc277cee9e1339180be552bb20c051
     );
   }
 
@@ -230,8 +264,40 @@ class _HomePageState extends State<HomePage> {
       } else {
         throw Exception('Falha ao obter os dados do usuário');
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Erro: $e');
+      print('Stack Trace: $stackTrace');
+    }
+  }
+
+  Future<List<CatItem>> fetchCatList() async {
+    final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+
+    try {
+      final token = await getToken();
+      final response = await http.get(uri, headers: {
+        'content-type': "application/json",
+        'authorization': "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        if (response.body != null && response.body.isNotEmpty) {
+          final Map<String, dynamic> jsonBody = json.decode(response.body);
+          final List<dynamic> catJsonList = jsonBody['content'] as List<dynamic>;
+          print(catJsonList.toString());
+          final List<CatItem> catList = catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+
+          return catList;
+        } else {
+          throw Exception('Empty response body');
+        }
+      } else {
+        throw Exception('Falha ao buscar a lista de gatos');
+      }
+    } catch (e, stackTrace) {
+      print('Erro: $e');
+      print('Stack Trace: $stackTrace');
+      throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
     }
   }
 

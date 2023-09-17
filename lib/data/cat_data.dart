@@ -9,6 +9,10 @@ class CatData extends ChangeNotifier {
     return listAllCats;
   }
 
+  void setAllCatsList(List<CatItem> catlist){
+    listAllCats = catlist;
+  }
+
   CatItem getByIndex(int index) {
     return getAllCatsList()[index];
   }

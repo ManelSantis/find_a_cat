@@ -27,17 +27,31 @@ class CatItem {
       required this.user});
 
   factory CatItem.createCat(Map<String, dynamic> json) => CatItem(
-        id: json['id'] as int,
-        name: json['name'],
-        title: json['title'],
-        description: json['description'],
-        image: json['picture'],
-        dateTime: json['date'],
-        latitude: json['latitude'],
-        longitude: json['longitude'],
-        // user: json['user']
-        user: User.fromJson(json['user']),
-      );
+      id: json['id'] as int,
+      name: json['name'],
+      title: json['title'],
+      description: json['description'],
+      image: json['picture'],
+      dateTime: json['date'],
+      latitude: json['latitude'],
+      longitude: json['longitude'],
+      user: json['user']);
+
+//   factory CatItem.fromJson( Map<String, dynamic> json) {
+//     return CatItem(
+//         id: json['id'],
+// >>>>>>> 9a86b985cdfc277cee9e1339180be552bb20c051
+//         name: json['name'],
+//         title: json['title'],
+//         description: json['description'],
+//         image: json['picture'],
+//         dateTime: json['date'],
+//         latitude: json['latitude'],
+//         longitude: json['longitude'],
+// <<<<<<< HEAD
+//         // user: json['user']
+//         user: User.fromJson(json['user']),
+//       );
 
   CatItem.fromJson(Map<String, dynamic> json) {
     id = json['id'] as int;
@@ -48,7 +62,8 @@ class CatItem {
     print(json['name']);
     description = json['description'];
     print(json['description']);
-    dateTime = DateTime.parse("${json['date'].toString().replaceAll("T", " ")}Z");
+    dateTime =
+        DateTime.parse("${json['date'].toString().replaceAll("T", " ")}Z");
     print(json['date']);
     image = json['picture'];
     print(json['picture']);
