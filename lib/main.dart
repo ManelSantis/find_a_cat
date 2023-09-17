@@ -14,7 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => CatData(),
-      builder: (context, child) => const MaterialApp(
+      builder: (context, child) =>  MaterialApp(
+        theme: ThemeData(fontFamily: "Inter"),
         debugShowCheckedModeBanner: false,
         home: Signin(),
       ),
