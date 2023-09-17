@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:find_a_cat/assets/constants.dart';
 import 'package:flutter/material.dart';
 import '../data/cat_data.dart';
 import '../models/cat_item.dart';
@@ -17,7 +18,6 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
-
 }
 
 class _HomePageState extends State<HomePage> {
@@ -35,17 +35,18 @@ class _HomePageState extends State<HomePage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  imageFile != null ?
-                  Image.file(
-                      imageFile!,
-                    width: 100,
-                    height: 100,
-                    fit: BoxFit.cover,
-                  ) : Icon(Icons.image),
+                  imageFile != null
+                      ? Image.file(
+                          imageFile!,
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(Icons.image),
                   SizedBox(height: 20),
                   TextButton(
-                      onPressed: _getFromCamera,
-                      child: Icon(Icons.add),
+                    onPressed: _getFromCamera,
+                    child: Icon(Icons.add),
                   ),
                   TextField(
                     controller: nameCat,
@@ -107,73 +108,76 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<CatData>(
       builder: (context, value, child) => Scaffold(
-          backgroundColor: Colors.grey[300],
-          floatingActionButton:
-          Row(
-              children: [
-                SizedBox(width: 140),
-                FloatingActionButton(
-            onPressed: addNewCat,
-            backgroundColor: Colors.blue[300],
-            child: Icon(Icons.add),
-          ),
-                SizedBox(width: 16),
-                FloatingActionButton(
-                onPressed: () {
-                  Navigator.push(
+        backgroundColor: Colors.grey[300],
+        floatingActionButton: Row(
+          children: [
+            SizedBox(width: 140),
+            FloatingActionButton(
+              heroTag: "addCat",
+              onPressed: addNewCat,
+              backgroundColor: Colors.blue[300],
+              child: Icon(Icons.add),
+            ),
+            SizedBox(width: 16),
+            FloatingActionButton(
+              heroTag: "viewMap",
+              onPressed: () {
+                Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CatMap(catData: Provider.of<CatData>(context).getAllCatsList()),
-                  ),
-                ); },
-                  backgroundColor: Colors.green[300],
-                child: Icon(Icons.map),
-               ),
-                ],
-          ),
-          body:
-          FutureBuilder<List<CatItem>>(
-            future: fetchCatList(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator(); // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
-              } else if (snapshot.hasError) {
-                return Text('Erro: ${snapshot.error}');
-              } else if (!snapshot.hasData) {
-                return Text('Nenhum dado disponível');
-              } else {
-                final catList = snapshot.data!;
-
-                return ListView.builder(
-                  itemCount: catList.length,
-                  itemBuilder: (context, index) => ListTile(
-                    title: Text('${catList[index].title} , ${value.convertDateTimeToString(catList[index].dateTime!)}'),
-                    onTap: () async {
-                      late Widget page = CatDescription(index: index);
-                      String retorno = "";
-                      try {
-                        retorno = await push(context, page);
-                      } catch (error) {
-                        print(retorno);
-                      }
-                    },
+                    builder: (context) => CatMap(
+                        catData:
+                            Provider.of<CatData>(context).getAllCatsList()),
                   ),
                 );
-              }
-            },
-          ),
+              },
+              backgroundColor: Colors.green[300],
+              child: Icon(Icons.map),
+            ),
+          ],
+        ),
+        body: FutureBuilder<List<CatItem>>(
+          future: fetchCatList(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator(); // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
+            } else if (snapshot.hasError) {
+              return Text('Erro: ${snapshot.error}');
+            } else if (!snapshot.hasData) {
+              return Text('Nenhum dado disponível');
+            } else {
+              final catList = snapshot.data!;
+
+              return ListView.builder(
+                itemCount: catList.length,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text(
+                      '${catList[index].title} , ${value.convertDateTimeToString(catList[index].dateTime!)}'),
+                  onTap: () async {
+                    late Widget page = CatDescription(index: index);
+                    String retorno = "";
+                    try {
+                      retorno = await push(context, page);
+                    } catch (error) {
+                      print(retorno);
+                    }
+                  },
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
 
   void _getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-      maxWidth: 360,
-      maxHeight: 360,
+        source: ImageSource.camera,
+        maxWidth: 360,
+        maxHeight: 360,
         imageQuality: 50,
-        preferredCameraDevice: CameraDevice.front
-    );
+        preferredCameraDevice: CameraDevice.front);
 
     setState(() {
       imageFile = File(pickedFile!.path);
@@ -185,22 +189,24 @@ class _HomePageState extends State<HomePage> {
       // Pode voltar, ou seja, a página é adicionada na pilha.
       return Navigator.push(context,
           MaterialPageRoute(builder: (BuildContext context) {
-            return page;
-          }));
+        return page;
+      }));
     } else {
       // Não pode voltar, ou seja, a página nova substitui a página atual.
       return Navigator.pushReplacement(context,
           MaterialPageRoute(builder: (BuildContext context) {
-            return page;
-          }));
+        return page;
+      }));
     }
   }
 
-  Future <Position?> _getCurrentPosition() async {
+  Future<Position?> _getCurrentPosition() async {
     try {
-      final Position? position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high,);
+      final Position? position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
       if (position != null) {
-          return position;
+        return position;
       } else {
         print("Posição não disponível");
       }
@@ -209,17 +215,22 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<CatItem> createCat (String name, String title, String description, DateTime dateTime, int image, double latitude, double longitude) async {
+  Future<CatItem> createCat(String name, String title, String description,
+      DateTime dateTime, int image, double latitude, double longitude) async {
     try {
       //final uri = Uri.parse("http://192.168.1.5:8080/cat/create");
-      final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
-      final String formattedDateTime = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime);
+      final uri = Uri.parse("$API_URL/cat/create");
+      final String formattedDateTime =
+          DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime);
 
       final token = await getToken();
       final username = await getUsername();
       //final userUri = Uri.parse("http://192.168.1.5:8080/user/username/$username");
-      final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
-      final responseUser = await http.get(userUri, headers: {'content-type': "application/json", 'authorization': "Bearer $token"});
+      final userUri = Uri.parse("$API_URL/user/username/$username");
+      final responseUser = await http.get(userUri, headers: {
+        'content-type': "application/json",
+        'authorization': "Bearer $token"
+      });
 
       if (responseUser.statusCode == 200) {
         final userData = json.decode(responseUser.body);
@@ -244,7 +255,8 @@ class _HomePageState extends State<HomePage> {
           'authorization': "Bearer $token",
         };
 
-        final response = await http.post(uri, headers: headers, body: json.encode(request));
+        final response =
+            await http.post(uri, headers: headers, body: json.encode(request));
 
         if (response.statusCode == 201) {
           debugPrint(response.body);
@@ -259,14 +271,13 @@ class _HomePageState extends State<HomePage> {
         throw Exception('Falha ao obter os dados do usuário');
       }
     } catch (e, stackTrace) {
-      throw('Erro: $e');
+      throw ('Erro: $e');
     }
-
   }
 
   Future<List<CatItem>> fetchCatList() async {
     //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
-    final uri = Uri.parse("http://172.23.96.1:8080/cat/paged");
+    final uri = Uri.parse("$API_URL/cat/paged");
 
     try {
       final token = await getToken();
@@ -278,8 +289,10 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         if (response.body != null && response.body.isNotEmpty) {
           final Map<String, dynamic> jsonBody = json.decode(response.body);
-          final List<dynamic> catJsonList = jsonBody['content'] as List<dynamic>;
-          final List<CatItem> catList = catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+          final List<dynamic> catJsonList =
+              jsonBody['content'] as List<dynamic>;
+          final List<CatItem> catList =
+              catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
 
           return catList;
         } else {
@@ -293,7 +306,6 @@ class _HomePageState extends State<HomePage> {
       print('Stack Trace: $stackTrace');
       throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
     }
-
   }
 
   Future<String?> getToken() async {
@@ -306,4 +318,3 @@ class _HomePageState extends State<HomePage> {
     return prefs.getString('username');
   }
 }
-

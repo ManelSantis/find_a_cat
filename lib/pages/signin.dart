@@ -1,3 +1,4 @@
+import 'package:find_a_cat/assets/constants.dart';
 import 'package:flutter/material.dart';
 import 'home_page.dart';
 import 'package:http/http.dart' as http;
@@ -35,8 +36,10 @@ class _SigninState extends State<Signin> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(height: 179,child: Image.asset('assets/images/Logo_md.png')),
-              SizedBox(height:56,child: Image.asset('assets/images/logomark.png')),
+              SizedBox(
+                  height: 179, child: Image.asset('assets/images/Logo_md.png')),
+              SizedBox(
+                  height: 56, child: Image.asset('assets/images/logomark.png')),
               const SizedBox(height: 90),
               SizedBox(
                 height: 60,
@@ -47,6 +50,7 @@ class _SigninState extends State<Signin> {
                     labelText: 'Username',
                     filled: true,
                     fillColor: Colors.white,
+                    contentPadding: EdgeInsets.all(25.0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: const BorderSide(
@@ -69,6 +73,7 @@ class _SigninState extends State<Signin> {
                     labelText: 'Password',
                     filled: true,
                     fillColor: Colors.white,
+                    contentPadding: EdgeInsets.all(25.0),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                       borderSide: const BorderSide(
@@ -103,7 +108,8 @@ class _SigninState extends State<Signin> {
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                           RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
-                        side:const  BorderSide(width: 1, color: Color(0xFFE97F2E)),
+                        side: const BorderSide(
+                            width: 1, color: Color(0xFFE97F2E)),
                       ))),
                   onPressed: () {
                     setState(() {
@@ -122,7 +128,10 @@ class _SigninState extends State<Signin> {
                       });
                     });
                   },
-                  child: const Text('Entrar', style: TextStyle(fontSize: 16,fontWeight: FontWeight.w700),),
+                  child: const Text(
+                    'Entrar',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
               SizedBox(height: 16),
@@ -167,8 +176,9 @@ class _SigninState extends State<Signin> {
 
   Future<String?> login(String username, String password) async {
     // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-    //final uri = Uri.parse("http://192.168.1.5:8080/auth/login");
-    final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
+    // final uri = Uri.parse("http://192.168.1.5:8080/auth/login");
+    // final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
+    final uri = Uri.parse("$API_URL/auth/login");
     final Map<String, dynamic> request = {
       'username': username,
       'password': password,
