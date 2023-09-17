@@ -3,38 +3,59 @@ import 'dart:io';
 import 'user.dart';
 
 class CatItem {
-  final int id;
-  final String name;
-  final String title;
-  final String description;
-  //final File? image;
-  final int image;
-  final DateTime dateTime;
-  final double latitude;
-  final double longitude;
-  final User user;
+  int? id;
+  String? name;
+  String? title;
+  String? description;
 
-  CatItem({
-    required this.id,
-    required this.name,
-    required this.title,
-    required this.description,
-    required this.image,
-    required this.dateTime,
-    required this.latitude,
-    required this.longitude,
-    required this.user
-  });
+  //final File? image;
+  String? image;
+  DateTime? dateTime;
+  double? latitude;
+  double? longitude;
+  User? user;
+
+  CatItem(
+      {required this.id,
+      required this.name,
+      required this.title,
+      required this.description,
+      required this.image,
+      required this.dateTime,
+      required this.latitude,
+      required this.longitude,
+      required this.user});
 
   factory CatItem.createCat(Map<String, dynamic> json) => CatItem(
-      id: json['id'],
-      name: json['name'],
-      title: json['title'],
-      description: json['description'],
-      image: json['picture'],
-      dateTime: json['date'],
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      user: json['user']
-  );
+        id: json['id'] as int,
+        name: json['name'],
+        title: json['title'],
+        description: json['description'],
+        image: json['picture'],
+        dateTime: json['date'],
+        latitude: json['latitude'],
+        longitude: json['longitude'],
+        // user: json['user']
+        user: User.fromJson(json['user']),
+      );
+
+  CatItem.fromJson(Map<String, dynamic> json) {
+    id = json['id'] as int;
+    print(json['id']);
+    title = json['title'];
+    print(json['title']);
+    name = json['name'];
+    print(json['name']);
+    description = json['description'];
+    print(json['description']);
+    dateTime = DateTime.parse("${json['date'].toString().replaceAll("T", " ")}Z");
+    print(json['date']);
+    image = json['picture'];
+    print(json['picture']);
+    latitude = (json['latitude'] as num?)?.toDouble();
+    print(json['latitude']);
+    longitude = (json['longitude'] as num?)?.toDouble();
+    print(json['longitude']);
+    user = json['user'] != null ? new User.fromJson(json['user']) : null;
+  }
 }

@@ -121,7 +121,7 @@ class _HomePageState extends State<HomePage> {
               ListView.builder(
                 itemCount: value.getAllCatsList().length,
                 itemBuilder: (context, index) => ListTile(
-                  title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime)}'),
+                  title: Text('${value.getAllCatsList()[index].title} , ${value.convertDateTimeToString(value.getAllCatsList()[index].dateTime!)}'),
                   onTap: () async {
                     late Widget page = CatDescription(index: index);
                     String retorno = "";
@@ -182,12 +182,14 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> createCat(String name, String title, String description, DateTime dateTime, int image, double latitude, double longitude) async {
     try {
-      final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
+      final uri = Uri.parse("http://192.168.1.5:8080/cat/create");
+      // final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
       final String formattedDateTime = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime);
 
       final token = await getToken();
       final username = await getUsername();
-      final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
+      final userUri = Uri.parse("http://192.168.1.5:8080/user/username/$username");
+      // final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
       final responseUser = await http.get(userUri, headers: {'content-type': "application/json", 'authorization': "Bearer $token"});
 
       if (responseUser.statusCode == 200) {
@@ -216,7 +218,12 @@ class _HomePageState extends State<HomePage> {
         final response = await http.post(uri, headers: headers, body: json.encode(request));
 
         if (response.statusCode == 201) {
-          CatItem.createCat(json.decode(response.body));
+          debugPrint(response.body);
+          Map<String, dynamic> jsonData = json.decode(response.body.toString());
+          debugPrint(jsonData.toString());
+          CatItem catitem = CatItem.fromJson(jsonData);
+          print(catitem.id??0);
+          //CatItem.createCat(json.decode(response.body));
         } else {
           throw Exception('Falha ao criar o gato');
         }

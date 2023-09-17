@@ -1,8 +1,8 @@
 class User {
-  final int id;
-  final String name;
-  final String username;
-  final String email;
+   int? id;
+   String? name;
+   String? username;
+   String? email;
   // final String password;
 
   User({
@@ -13,17 +13,22 @@ class User {
     // required this.password
   });
 
-  factory User.fromJson(Map<String, dynamic> json) => User(
-    id: json['id'],
-    name: json['name'],
-    email: json['email'],
-    username: json['username'],
-    // password: json['password']
-  );
-
+  // factory User.fromJson(Map<String, dynamic> json) => User(
+  //   id: json['id'] as int,
+  //   name: json['name'],
+  //   email: json['email'],
+  //   username: json['username'],
+  //   // password: json['password']
+  // );
+  User.fromJson(Map<String, dynamic> json) {
+    id = json['id'] as int;
+    name = json['name'];
+    username = json['username'];
+    email = json['email'];
+  }
   factory User.getJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
+      id: json['id'] as int ,
       name: json['name'],
       username: json['username'],
       email: json['email'],

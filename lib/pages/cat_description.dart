@@ -36,7 +36,7 @@ class _CatDescriptionState extends State<CatDescription> {
             ),*/
             Text('Nome: ${catItem.title}'),
             Text('Descrição: ${catItem.description}'),
-            Text('Data: ${catData.convertDateTimeToString(catItem.dateTime)}'),
+            Text('Data: ${catData.convertDateTimeToString(catItem.dateTime!)}'),
           ],
         ),
       ),

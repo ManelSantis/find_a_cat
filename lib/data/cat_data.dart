@@ -119,7 +119,7 @@ class CatData extends ChangeNotifier {
     Map<String, double> dailyCats = {};
 
     for (var cat in listAllCats) {
-      String date = convertDateTimeToString(cat.dateTime);
+      String date = convertDateTimeToString(cat.dateTime!);
       double value = 1;
 
       if (dailyCats.containsKey(date)) {

@@ -24,47 +24,56 @@ class _SignupState extends State<Signup> {
     Future<User?>? user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Cadastro'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: nameUser,
-              decoration: InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: usernameUser,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: emailUser,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: passwordUser,
-              obscureText: true,
-              decoration: InputDecoration(labelText: 'Password'),
-            ),
-            TextField(
-              controller: confirmPasswordUser,
-              obscureText: true,
-              decoration: InputDecoration(labelText: 'Confirm Password'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
+      // appBar: AppBar(
+      //   title: Text('Cadastro'),
+      // ),
+      body: Container(
+        decoration:const  BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/bg_cad.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.asset('assets/images/Logo_sm.png'),
+              TextField(
+                controller: nameUser,
+                decoration: InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: usernameUser,
+                decoration: InputDecoration(labelText: 'Username'),
+              ),
+              TextField(
+                controller: emailUser,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              TextField(
+                controller: passwordUser,
+                obscureText: true,
+                decoration: InputDecoration(labelText: 'Password'),
+              ),
+              TextField(
+                controller: confirmPasswordUser,
+                obscureText: true,
+                decoration: InputDecoration(labelText: 'Confirm Password'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
 
-                  user = createUser(nameUser.text, usernameUser.text, emailUser.text, passwordUser.text);
+                    user = createUser(nameUser.text, usernameUser.text, emailUser.text, passwordUser.text);
 
-                });
-              },
-              child: Text('Concluir'),
-            ),
-          ],
+                  });
+                },
+                child: Text('Concluir'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -81,7 +90,8 @@ class _SignupState extends State<Signup> {
         'content-type':"application/json"
       };
       // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-      final uri = Uri.parse("http://172.23.96.1:8080/user/register");
+      final uri = Uri.parse("http://192.168.1.5:8080/user/register");
+      // final uri = Uri.parse("http://172.23.96.1:8080/user/register");
       debugPrint(request.toString());
 
       final response = await http.post(uri,headers: headers, body: jsonEncode(request));

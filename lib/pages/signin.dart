@@ -24,67 +24,77 @@ class _SigninState extends State<Signin> {
     String? token;
 
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: usernameUser,
-              decoration: InputDecoration(labelText: 'Username'),
-            ),
-            TextField(
-              controller: passwordUser,
-              obscureText: true,
-              decoration: InputDecoration(labelText: 'Password'),
-            ),
-            SizedBox(height: 16),
-            Visibility(
-              visible: showError,
-              child: Text(
-                'Credenciais inválidas. Por favor, tente novamente.',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+      body: Container(
+        decoration:const  BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/images/bg_login.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Image.asset('assets/images/Logo_md.png'),
+              Image.asset('assets/images/logomark.png'),
+              TextField(
+                controller: usernameUser,
+                decoration: InputDecoration(labelText: 'Username'),
+              ),
+              TextField(
+                controller: passwordUser,
+                obscureText: true,
+                decoration: InputDecoration(labelText: 'Password'),
+              ),
+              SizedBox(height: 16),
+              Visibility(
+                visible: showError,
+                child: const Text(
+                  'Credenciais inválidas. Por favor, tente novamente.',
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  login(usernameUser.text, passwordUser.text).then((value) {
-                    token = value;
-                    if (token != null) {
-                      saveToken(token!, usernameUser.text);
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HomePage(),
-                          )
-                      );
-                    } else {
-                      showError = true;
-                    }
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    login(usernameUser.text, passwordUser.text).then((value) {
+                      token = value;
+                      if (token != null) {
+                        saveToken(token!, usernameUser.text);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomePage(),
+                            )
+                        );
+                      } else {
+                        showError = true;
+                      }
+                    });
                   });
-                });
-              },
-              child: Text('Entrar'),
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Signup(),
-                    )
-                );
-              },
-              child: Text('Cadastrar'),
-            ),
-          ],
+                },
+                child: Text('Entrar'),
+              ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Signup(),
+                      )
+                  );
+                },
+                child: Text('Cadastrar'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -92,7 +102,8 @@ class _SigninState extends State<Signin> {
 
   Future<String?> login(String username, String password) async {
     // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-    final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
+    final uri = Uri.parse("http://192.168.1.5:8080/auth/login");
+    // final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
     final Map<String, dynamic> request = {
       'username': username,
       'password': password,
