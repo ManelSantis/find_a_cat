@@ -81,7 +81,7 @@ class _SignupState extends State<Signup> {
         'content-type':"application/json"
       };
       // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-      final uri = Uri.parse("http://192.168.1.2:8080/user/register");
+      final uri = Uri.parse("http://172.23.96.1:8080/user/register");
       debugPrint(request.toString());
 
       final response = await http.post(uri,headers: headers, body: jsonEncode(request));

@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:find_a_cat/components/CatMap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -70,19 +71,7 @@ class _HomePageState extends State<HomePage> {
   void save() async {
     final Position? location = await _getCurrentPosition();
     if (location != null) {
-
-      CatItem cat = CatItem(
-          id: 0,
-          name: nameCat.text,
-          title: titleCat.text,
-          description: descriptionCat.text,
-          image: imageFile,
-          dateTime: DateTime.now(),
-          latitude: location.latitude,
-          longitude: location.longitude
-      );
-      Provider.of<CatData>(context, listen: false).addNewCat(cat);
-      createCat(nameCat.text, titleCat.text, descriptionCat.text, DateTime.now(), imageFile, location.latitude, location.longitude);
+      createCat(nameCat.text, titleCat.text, descriptionCat.text, DateTime.now(), 123, location.latitude, location.longitude);
     }
     clear();
     Navigator.pop(context);
@@ -191,31 +180,62 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> createCat(String name, String title, String description, DateTime dateTime, File? image, double latitude, double longitude) async {
-    final uri = Uri.parse("");
-    final Map<String, dynamic> request = {
-      'name': name,
-      'title': title,
-      'description': description,
-      'date': dateTime,
-      'picture': image,
-      'latitude': latitude,
-      'longitude': longitude,
-    };
+  Future<void> createCat(String name, String title, String description, DateTime dateTime, int image, double latitude, double longitude) async {
+    try {
+      final uri = Uri.parse("http://172.23.96.1:8080/cat/create");
+      final String formattedDateTime = DateFormat("yyyy-MM-ddTHH:mm:ss").format(dateTime);
 
-    final response = await http.post(uri, body: request);
+      final token = await getToken();
+      final username = await getUsername();
+      final userUri = Uri.parse("http://172.23.96.1:8080/user/username/$username");
+      final responseUser = await http.get(userUri, headers: {'content-type': "application/json", 'authorization': "Bearer $token"});
 
-    if (response.statusCode == 201) {
-      CatItem.createCat(json.decode(response.body));
-      return print(json.decode(response.body));
-    } else {
-      throw Exception('Falha ao criar o gato');
+      if (responseUser.statusCode == 200) {
+        final userData = json.decode(responseUser.body);
+        final Map<String, dynamic> request = {
+          'name': name,
+          'title': title,
+          'description': description,
+          'date': formattedDateTime,
+          'picture': image,
+          'latitude': latitude,
+          'longitude': longitude,
+          'user': {
+            'id': userData['id'],
+            'name': userData['name'],
+            'username': userData['username'],
+            'email': userData['email']
+          },
+        };
+
+        final headers = {
+          'content-type': "application/json",
+          'authorization': "Bearer $token",
+        };
+
+        final response = await http.post(uri, headers: headers, body: json.encode(request));
+
+        if (response.statusCode == 201) {
+          CatItem.createCat(json.decode(response.body));
+        } else {
+          throw Exception('Falha ao criar o gato');
+        }
+      } else {
+        throw Exception('Falha ao obter os dados do usuário');
+      }
+    } catch (e) {
+      print('Erro: $e');
     }
   }
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userToken');
+  }
+
+  Future<String?> getUsername() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username');
   }
 }
 

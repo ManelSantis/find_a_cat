@@ -28,12 +28,12 @@ class _CatDescriptionState extends State<CatDescription> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.file(
+            /*Image.file(
               catItem.image!,
               width: 360,
               height: 360,
               fit: BoxFit.cover,
-            ),
+            ),*/
             Text('Nome: ${catItem.title}'),
             Text('Descrição: ${catItem.description}'),
             Text('Data: ${catData.convertDateTimeToString(catItem.dateTime)}'),

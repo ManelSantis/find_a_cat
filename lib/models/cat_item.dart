@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:geolocator/geolocator.dart';
+
 import 'user.dart';
 
 class CatItem {
@@ -7,10 +7,12 @@ class CatItem {
   final String name;
   final String title;
   final String description;
-  final File? image;
+  //final File? image;
+  final int image;
   final DateTime dateTime;
   final double latitude;
   final double longitude;
+  final User user;
 
   CatItem({
     required this.id,
@@ -20,7 +22,8 @@ class CatItem {
     required this.image,
     required this.dateTime,
     required this.latitude,
-    required this.longitude
+    required this.longitude,
+    required this.user
   });
 
   factory CatItem.createCat(Map<String, dynamic> json) => CatItem(
@@ -31,6 +34,7 @@ class CatItem {
       image: json['picture'],
       dateTime: json['date'],
       latitude: json['latitude'],
-      longitude: json['longitude']
+      longitude: json['longitude'],
+      user: json['user']
   );
 }

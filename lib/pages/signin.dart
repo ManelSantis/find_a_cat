@@ -17,10 +17,11 @@ class Signin extends StatefulWidget {
 class _SigninState extends State<Signin> {
   TextEditingController usernameUser = TextEditingController();
   TextEditingController passwordUser = TextEditingController();
+  bool showError = false;
 
   @override
   Widget build(BuildContext context) {
-    Future<String> token;
+    String? token;
 
     return Scaffold(
       body: Padding(
@@ -37,21 +38,41 @@ class _SigninState extends State<Signin> {
               obscureText: true,
               decoration: InputDecoration(labelText: 'Password'),
             ),
+            SizedBox(height: 16),
+            Visibility(
+              visible: showError,
+              child: Text(
+                'Credenciais inválidas. Por favor, tente novamente.',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  token = login(usernameUser.text, passwordUser.text);
-                  saveToken(token as String);
+                  login(usernameUser.text, passwordUser.text).then((value) {
+                    token = value;
+                    if (token != null) {
+                      saveToken(token!, usernameUser.text);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(),
+                          )
+                      );
+                    } else {
+                      showError = true;
+                    }
+                  });
                 });
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                    builder: (context) => HomePage(),
-                    )
-                );
               },
               child: Text('Entrar'),
             ),
+            SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -69,9 +90,9 @@ class _SigninState extends State<Signin> {
     );
   }
 
-  Future<String> login(String username, String password) async {
+  Future<String?> login(String username, String password) async {
     // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-    final uri = Uri.parse("http://192.168.1.2:8080/auth/login");
+    final uri = Uri.parse("http://172.23.96.1:8080/auth/login");
     final Map<String, dynamic> request = {
       'username': username,
       'password': password,
@@ -84,20 +105,22 @@ class _SigninState extends State<Signin> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);
       final String token = responseData['token'];
-      if (token != null) {
-        return token;
-      } else {
-        throw Exception('Token não encontrado na resposta da API');
-      }
+      print("responseData['token']");
+      return token;
     } else {
-      throw Exception('Failed to login');
+      String? token = null;
+      return token;
     }
   }
 
-  Future<void> saveToken(String token) async {
+  Future<void> saveToken(String token, String username) async {
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('userToken', token);
+    await prefs.setString('username', username);
   }
+
+
 
   Future push(BuildContext context, Widget page, {bool flagBack = true}) {
     if (flagBack) {
