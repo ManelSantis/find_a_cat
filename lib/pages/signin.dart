@@ -70,13 +70,16 @@ class _SigninState extends State<Signin> {
   }
 
   Future<String> login(String username, String password) async {
-    final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
+    // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
+    final uri = Uri.parse("http://192.168.1.2:8080/auth/login");
     final Map<String, dynamic> request = {
       'username': username,
       'password': password,
     };
-
-    final response = await http.post(uri, body: request);
+    Map<String,String> headers = {
+      'content-type':"application/json"
+    };
+    final response = await http.post(uri,headers: headers, body: jsonEncode(request));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> responseData = json.decode(response.body);

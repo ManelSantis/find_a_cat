@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:find_a_cat/pages/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../models/user.dart';
-
+import 'dart:convert';
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
@@ -76,15 +77,36 @@ class _SignupState extends State<Signup> {
         'email': email,
         'password': password
       };
+      Map<String,String> headers = {
+        'content-type':"application/json"
+      };
+      // final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
+      final uri = Uri.parse("http://192.168.1.2:8080/user/register");
+      debugPrint(request.toString());
 
-      final uri = Uri.parse("https://jsonplaceholder.typicode.com/posts");
-      final response = await http.post(uri, body: request);
+      final response = await http.post(uri,headers: headers, body: jsonEncode(request));
 
       if (response.statusCode == 201){
         print(response.body);
+
         return User.fromJson(json.decode(response.body));
       } else {
         throw Exception('Falied');
       }
+  }
+  Future push(BuildContext context, Widget page, {bool flagBack = true}) {
+    if (flagBack) {
+      // Pode voltar, ou seja, a página é adicionada na pilha.
+      return Navigator.push(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return page;
+          }));
+    } else {
+      // Não pode voltar, ou seja, a página nova substitui a página atual.
+      return Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) {
+            return page;
+          }));
+    }
   }
 }
