@@ -3,7 +3,15 @@ import 'package:provider/provider.dart';
 import 'data/cat_data.dart';
 import 'pages/signin.dart';
 
-void main() {
+//FIREBASE
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 

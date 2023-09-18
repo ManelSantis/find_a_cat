@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "681779716913",
+    "project_id": "find-a-cat-78ac7",
+    "storage_bucket": "find-a-cat-78ac7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681779716913:android:338fdfd05f3b5ad1e04610",
+        "android_client_info": {
+          "package_name": "com.example.find_a_cat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCo4KaDUQRNv1yZV4EhtiGSM2i9RS2eYuk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

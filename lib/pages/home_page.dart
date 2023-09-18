@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:find_a_cat/assets/constants.dart';
+import 'package:find_a_cat/firebase/storage.dart';
 import 'package:flutter/material.dart';
 import '../data/cat_data.dart';
 import '../models/cat_item.dart';
@@ -12,6 +13,9 @@ import 'package:find_a_cat/components/CatMap.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   final descriptionCat = TextEditingController();
   ImagePicker imagePicker = ImagePicker();
   File? imageFile;
+  String pathImg = "";
 
   void addNewCat() {
     showDialog(
@@ -63,8 +68,34 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               actions: [
-                MaterialButton(onPressed: save, child: Text('Adicionar')),
-                MaterialButton(onPressed: cancel, child: Text('Cancelar')),
+                TextButton(
+                    onPressed: cancel,
+                    style: ButtonStyle(
+
+                        shape:
+                        MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.0),
+                              // side: const BorderSide(
+                              //     width: 0, color:  Color(0xFF058B9C)),
+                            ))),
+                    child: const Text(
+                      'Cancelar',
+                      style: TextStyle(fontWeight: FontWeight.w600,color: Color(0xFF058B9C)),
+                    )),
+                ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFFFF9C51)),
+                        shape:
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          side: const BorderSide(
+                              width: 1, color: Color(0xFFE97F2E)),
+                        ))),
+                    onPressed: save,
+                    child: Text('Adicionar')),
               ],
             ));
   }
@@ -118,7 +149,6 @@ class _HomePageState extends State<HomePage> {
               width: 42,
               child: FloatingActionButton(
                 heroTag: "viewMap",
-
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -130,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 backgroundColor: const Color(0xFF2ED4E9),
-                child:const Icon(Icons.map),
+                child: const Icon(Icons.map),
               ),
             ),
             const SizedBox(width: 16),
@@ -141,7 +171,7 @@ class _HomePageState extends State<HomePage> {
                 heroTag: "addCat",
                 onPressed: addNewCat,
                 backgroundColor: const Color(0xFFE97F2E),
-                child: const Icon(Icons.add,size: 40),
+                child: const Icon(Icons.add, size: 40),
               ),
             ),
           ],
@@ -161,17 +191,18 @@ class _HomePageState extends State<HomePage> {
               return ListView.builder(
                 itemCount: catList.length,
                 itemBuilder: (context, index) => ListTile(
+                  leading: Image.network(catList[index].image!),
                   title: Text(
                       '${catList[index].title} , ${value.convertDateTimeToString(catList[index].dateTime!)}'),
-                  onTap: () async {
-                    late Widget page = CatDescription(index: index);
-                    String retorno = "";
-                    try {
-                      retorno = await push(context, page);
-                    } catch (error) {
-                      print(retorno);
-                    }
-                  },
+                  // onTap: () async {
+                  //   late Widget page = CatDescription(index: index);
+                  //   String retorno = "";
+                  //   try {
+                  //     retorno = await push(context, page);
+                  //   } catch (error) {
+                  //     print(retorno);
+                  //   }
+                  // },
                 ),
               );
             }
@@ -191,7 +222,13 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       imageFile = File(pickedFile!.path);
+      //pathImg = pickedFile!.path;
     });
+    // if (imageFile != null) {
+    //   String? imageLink = await StorageClient()
+    //       .uploadImageToFirebase(imageFile: imageFile!);
+    //   print(imageLink!);
+    // }
   }
 
   Future push(BuildContext context, Widget page, {bool flagBack = true}) {
@@ -242,6 +279,13 @@ class _HomePageState extends State<HomePage> {
         'authorization': "Bearer $token"
       });
 
+      String imgUrl = "";
+      if (imageFile != null) {
+        String? imageLink =
+            await StorageClient().uploadImageToFirebase(imageFile: imageFile!);
+        print(imageLink!);
+        imgUrl = imageLink!;
+      }
       if (responseUser.statusCode == 200) {
         final userData = json.decode(responseUser.body);
         final Map<String, dynamic> request = {
@@ -249,7 +293,7 @@ class _HomePageState extends State<HomePage> {
           'title': title,
           'description': description,
           'date': formattedDateTime,
-          'picture': image,
+          'picture': imgUrl,
           'latitude': latitude,
           'longitude': longitude,
           'user': {
@@ -259,7 +303,7 @@ class _HomePageState extends State<HomePage> {
             'email': userData['email']
           },
         };
-
+        filepathToBas64(pathImg);
         final headers = {
           'content-type': "application/json",
           'authorization': "Bearer $token",
@@ -326,5 +370,13 @@ class _HomePageState extends State<HomePage> {
   Future<String?> getUsername() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('username');
+  }
+
+  void filepathToBas64(String imgPath) async {
+    File imagefile = File(imgPath);
+    Uint8List imagebytes = await imagefile.readAsBytes(); //convert to bytes
+    String base64string =
+        base64.encode(imagebytes); //convert bytes to base64 string
+    print(base64string);
   }
 }
