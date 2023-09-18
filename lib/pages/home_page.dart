@@ -110,29 +110,39 @@ class _HomePageState extends State<HomePage> {
       builder: (context, value, child) => Scaffold(
         backgroundColor: Colors.grey[300],
         floatingActionButton: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            SizedBox(width: 140),
-            FloatingActionButton(
-              heroTag: "addCat",
-              onPressed: addNewCat,
-              backgroundColor: Colors.blue[300],
-              child: Icon(Icons.add),
+            SizedBox(
+              height: 42,
+              width: 42,
+              child: FloatingActionButton(
+                heroTag: "viewMap",
+
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CatMap(
+                          catData:
+                              Provider.of<CatData>(context).getAllCatsList()),
+                    ),
+                  );
+                },
+                backgroundColor: const Color(0xFF2ED4E9),
+                child:const Icon(Icons.map),
+              ),
             ),
-            SizedBox(width: 16),
-            FloatingActionButton(
-              heroTag: "viewMap",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => CatMap(
-                        catData:
-                            Provider.of<CatData>(context).getAllCatsList()),
-                  ),
-                );
-              },
-              backgroundColor: Colors.green[300],
-              child: Icon(Icons.map),
+            const SizedBox(width: 16),
+            SizedBox(
+              height: 65,
+              width: 65,
+              child: FloatingActionButton(
+                heroTag: "addCat",
+                onPressed: addNewCat,
+                backgroundColor: const Color(0xFFE97F2E),
+                child: const Icon(Icons.add,size: 40),
+              ),
             ),
           ],
         ),

@@ -3,12 +3,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/cat_item.dart';
 import 'package:geolocator/geolocator.dart';
-
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 
 class CatMap extends StatefulWidget {
   final List<CatItem> catData;
 
   const CatMap({Key? key, required this.catData}) : super(key: key);
+
   @override
   State<CatMap> createState() => _CatMapState();
 }
@@ -26,6 +27,14 @@ class _CatMapState extends State<CatMap> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mapa de Gatos'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[Color(0xFFE97F2E), Color(0xFFFF9C51)]),
+          ),
+        ),
       ),
       body: FutureBuilder<LatLng?>(
         future: _getCurrentPosition(),
@@ -44,7 +53,8 @@ class _CatMapState extends State<CatMap> {
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.example.app',
                   ),
                   MarkerLayer(
@@ -59,6 +69,7 @@ class _CatMapState extends State<CatMap> {
                       );
                     }).toList(),
                   ),
+                  // CurrentLocationLayer(),
                 ],
               );
             }
@@ -68,9 +79,12 @@ class _CatMapState extends State<CatMap> {
       ),
     );
   }
-  Future <LatLng?> _getCurrentPosition() async {
+
+  Future<LatLng?> _getCurrentPosition() async {
     try {
-      final Position? position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high,);
+      final Position? position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
       if (position != null) {
         return LatLng(position.latitude, position.longitude);
       }
@@ -78,5 +92,4 @@ class _CatMapState extends State<CatMap> {
       print('Erro ao obter a posição: $e');
     }
   }
-
 }
