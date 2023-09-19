@@ -1,10 +1,14 @@
+import 'dart:convert';
+
+import 'package:find_a_cat/assets/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/cat_item.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-
+import 'package:http/http.dart' as http;
 class CatMap extends StatefulWidget {
   final List<CatItem> catData;
 
@@ -17,9 +21,14 @@ class CatMap extends StatefulWidget {
 class _CatMapState extends State<CatMap> {
   LatLng currentPosition = LatLng(0, 0);
 
-  @override
+  List<CatItem>? gatos;
+
+
+
   void initState() {
     super.initState();
+    // Chame sua função aqui
+    fetchCatList();
   }
 
   @override
@@ -49,7 +58,7 @@ class _CatMapState extends State<CatMap> {
               return FlutterMap(
                 options: MapOptions(
                   center: currentPosition,
-                  zoom: 9.2,
+                  zoom: 16.2,
                 ),
                 children: [
                   TileLayer(
@@ -58,7 +67,8 @@ class _CatMapState extends State<CatMap> {
                     userAgentPackageName: 'com.example.app',
                   ),
                   MarkerLayer(
-                    markers: widget.catData.map((cat) {
+                    // markers: widget.catData.map((cat) {
+                    markers: gatos!.map((cat) {
                       return Marker(
                         point: cat.latitude != null && cat.longitude != null
                             ? LatLng(cat.latitude!, cat.longitude!)
@@ -69,7 +79,7 @@ class _CatMapState extends State<CatMap> {
                       );
                     }).toList(),
                   ),
-                  // CurrentLocationLayer(),
+                  //CurrentLocationLayer(),
                 ],
               );
             }
@@ -91,5 +101,44 @@ class _CatMapState extends State<CatMap> {
     } catch (e) {
       print('Erro ao obter a posição: $e');
     }
+  }
+  Future<List<CatItem>> fetchCatList() async {
+    //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+    final uri = Uri.parse("$API_URL/cat/paged");
+
+    try {
+      final token = await getToken();
+      final response = await http.get(uri, headers: {
+        'content-type': "application/json",
+        'authorization': "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        if (response.body != null && response.body.isNotEmpty) {
+          final Map<String, dynamic> jsonBody = json.decode(response.body);
+          final List<dynamic> catJsonList =
+          jsonBody['content'] as List<dynamic>;
+          final List<CatItem> catList =
+          catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+          setState(() {
+            gatos = catList;
+          });
+          return catList;
+        } else {
+          throw Exception('Empty response body');
+        }
+      } else {
+        throw Exception('Falha ao buscar a lista de gatos');
+      }
+    } catch (e, stackTrace) {
+      print('Erro: $e');
+      print('Stack Trace: $stackTrace');
+      throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
+    }
+  }
+
+  Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('userToken');
   }
 }

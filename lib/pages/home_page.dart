@@ -40,7 +40,6 @@ class _HomePageState extends State<HomePage> {
     // Chame sua função aqui
     fetchUser();
   }
-
   void addNewCat() {
     showDialog(
         context: context,
@@ -153,15 +152,34 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           automaticallyImplyLeading: false,
           toolbarHeight: 72,
-          title:  Row(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text("${loggedUser?.name }",style:const TextStyle(fontWeight: FontWeight.w600),),
-                  Text("${loggedUser?.username}",style:const TextStyle(fontSize: 14,fontWeight: FontWeight.w400),)
+                  Text(
+                    "${loggedUser?.name}",
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    softWrap: false,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text("${loggedUser?.username}",
+                      style: const TextStyle(
+                          fontSize: 14, fontWeight: FontWeight.w400),
+                      softWrap: false,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis)
                 ],
+              ),
+              IconButton(
+                iconSize: 40,
+                icon: const Icon(Icons.account_circle),
+                onPressed: () {
+                  // ...
+                },
               ),
             ],
           ),
@@ -244,6 +262,9 @@ class _HomePageState extends State<HomePage> {
                                     style: const TextStyle(
                                         fontWeight: FontWeight.w700,
                                         fontSize: 16),
+                                    softWrap: false,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                   Text(
                                     value.convertDateTimeToString(
@@ -252,10 +273,18 @@ class _HomePageState extends State<HomePage> {
                                         fontWeight: FontWeight.normal,
                                         fontSize: 14,
                                         color: Colors.black45),
+                                    softWrap: false,
+                                    maxLines: 6,
+                                    overflow: TextOverflow.ellipsis,
                                   )
                                 ]),
                           ),
-                          Image.network(catList[index].image!),
+                          Container(
+                              width: 390,
+                              child: Image.network(
+                                catList[index].image!,
+                                fit: BoxFit.cover,
+                              )),
                           Row(children: [
                             Padding(
                               padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
@@ -265,6 +294,9 @@ class _HomePageState extends State<HomePage> {
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black45),
+                                softWrap: false,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ]
@@ -287,23 +319,27 @@ class _HomePageState extends State<HomePage> {
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
+                                softWrap: false,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ]),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
-                            child: Row(
-                              children: [
-                                Text(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
+                              child: Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Text(
                                   '${catList[index].description}',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.normal,
                                   ),
-                                )
-                              ],
-                            ),
-                          ),
+                                  softWrap: false,
+                                  maxLines: 6,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )),
                           const Divider()
                         ],
                       ),
@@ -321,9 +357,9 @@ class _HomePageState extends State<HomePage> {
   void _getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(
         source: ImageSource.camera,
-        maxWidth: 300,
-        maxHeight: 300,
-        imageQuality: 50,
+        maxWidth: 500,
+        maxHeight: 500,
+        imageQuality: 80,
         preferredCameraDevice: CameraDevice.front);
 
     setState(() {

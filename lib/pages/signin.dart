@@ -23,7 +23,7 @@ class _SigninState extends State<Signin> {
     String? token;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -33,141 +33,143 @@ class _SigninState extends State<Signin> {
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(50, 30, 50, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                  height: 179, child: Image.asset('assets/images/Logo_md.png')),
-              SizedBox(
-                  height: 56, child: Image.asset('assets/images/logomark.png')),
-              const SizedBox(height: 90),
-              SizedBox(
-                height: 60,
-                width: 260,
-                child: TextField(
-                  controller: usernameUser,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: EdgeInsets.all(25.0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFBEBEBE),
-                        width: 1,
-                        style: BorderStyle.solid,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                    height: 179, child: Image.asset('assets/images/Logo_md.png')),
+                SizedBox(
+                    height: 56, child: Image.asset('assets/images/logomark.png')),
+                const SizedBox(height: 90),
+                SizedBox(
+                  height: 60,
+                  width: 260,
+                  child: TextField(
+                    controller: usernameUser,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.all(25.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFBEBEBE),
+                          width: 1,
+                          style: BorderStyle.solid,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 60,
-                width: 260,
-                child: TextField(
-                  controller: passwordUser,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: EdgeInsets.all(25.0),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: const BorderSide(
-                        color: Color(0xFFBEBEBE),
-                        width: 1,
-                        style: BorderStyle.solid,
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 60,
+                  width: 260,
+                  child: TextField(
+                    controller: passwordUser,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.all(25.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFBEBEBE),
+                          width: 1,
+                          style: BorderStyle.solid,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Visibility(
-                visible: showError,
-                child: const Text(
-                  'Credenciais inválidas. Por favor, tente novamente.',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                height: 50,
-                width: 260,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          const Color(0xFFFF9C51)),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0),
-                        side: const BorderSide(
-                            width: 1, color: Color(0xFFE97F2E)),
-                      ))),
-                  onPressed: () {
-                    setState(() {
-                      login(usernameUser.text, passwordUser.text).then((value) {
-                        token = value;
-                        if (token != null) {
-                          saveToken(token!, usernameUser.text);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomePage(),
-                              ));
-                        } else {
-                          showError = true;
-                        }
-                      });
-                    });
-                  },
+                SizedBox(height: 16),
+                Visibility(
+                  visible: showError,
                   child: const Text(
-                    'Entrar',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                    'Credenciais inválidas. Por favor, tente novamente.',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Não tem conta?",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  TextButton(
+                const SizedBox(height: 30),
+                SizedBox(
+                  height: 50,
+                  width: 260,
+                  child: ElevatedButton(
                     style: ButtonStyle(
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      // side: BorderSide(width: 1, color: Color(0xFFE97F2E)),
-                    ))),
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color(0xFFFF9C51)),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                          side: const BorderSide(
+                              width: 1, color: Color(0xFFE97F2E)),
+                        ))),
                     onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Signup(),
-                          ));
+                      setState(() {
+                        login(usernameUser.text, passwordUser.text).then((value) {
+                          token = value;
+                          if (token != null) {
+                            saveToken(token!, usernameUser.text);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HomePage(),
+                                ));
+                          } else {
+                            showError = true;
+                          }
+                        });
+                      });
                     },
                     child: const Text(
-                      'Cadastrar',
-                      style: TextStyle(
-                          color: Color(0xFFE97F2E),
-                          decoration: TextDecoration.underline),
+                      'Entrar',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                SizedBox(height: 16),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Não tem conta?",
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    TextButton(
+                      style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                        // side: BorderSide(width: 1, color: Color(0xFFE97F2E)),
+                      ))),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Signup(),
+                            ));
+                      },
+                      child: const Text(
+                        'Cadastrar',
+                        style: TextStyle(
+                            color: Color(0xFFE97F2E),
+                            decoration: TextDecoration.underline),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

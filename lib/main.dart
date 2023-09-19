@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data/cat_data.dart';
 import 'pages/signin.dart';
+import 'dart:io';
 
 //FIREBASE
 import 'package:firebase_core/firebase_core.dart';
