@@ -242,7 +242,6 @@ class _HomePageState extends State<HomePage> {
                 return Text('Nenhum dado disponível');
               } else {
                 final catList = snapshot.data!;
-
                 return SingleChildScrollView(
                   child: ListView.builder(
                     shrinkWrap: true,

@@ -28,7 +28,7 @@ class _SignupState extends State<Signup> {
       // appBar: AppBar(
       //   title: Text('Cadastro'),
       // ),
-      resizeToAvoidBottomInset: false,
+       resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(

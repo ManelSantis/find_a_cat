@@ -58,6 +58,7 @@ class _CatMapState extends State<CatMap> {
               return FlutterMap(
                 options: MapOptions(
                   maxZoom: 18.4,
+                  minZoom: 1.8,
                   center: currentPosition,
                   zoom: 16.2,
                 ),
@@ -74,8 +75,8 @@ class _CatMapState extends State<CatMap> {
                         point: cat.latitude != null && cat.longitude != null
                             ? LatLng(cat.latitude!, cat.longitude!)
                             : LatLng(0, 0),
-                        width: 15,
-                        height: 15,
+                        width: 25,
+                        height: 25,
                         // builder: (context) => FlutterLogo(),
                         // builder: (context) => Image.asset('assets/images/cat.png'),
                         builder: (context) => GestureDetector(
