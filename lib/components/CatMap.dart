@@ -9,6 +9,7 @@ import '../models/cat_item.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:http/http.dart' as http;
+
 class CatMap extends StatefulWidget {
   final List<CatItem> catData;
 
@@ -23,8 +24,6 @@ class _CatMapState extends State<CatMap> {
 
   List<CatItem>? gatos;
 
-
-
   void initState() {
     super.initState();
     // Chame sua função aqui
@@ -35,7 +34,8 @@ class _CatMapState extends State<CatMap> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mapa de Gatos'),
+        title: const Text('Mapa de Gatos'),
+        toolbarHeight: 72,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -57,6 +57,7 @@ class _CatMapState extends State<CatMap> {
             if (currentPosition != null) {
               return FlutterMap(
                 options: MapOptions(
+                  maxZoom: 18.4,
                   center: currentPosition,
                   zoom: 16.2,
                 ),
@@ -73,9 +74,18 @@ class _CatMapState extends State<CatMap> {
                         point: cat.latitude != null && cat.longitude != null
                             ? LatLng(cat.latitude!, cat.longitude!)
                             : LatLng(0, 0),
-                        width: 20,
-                        height: 20,
-                        builder: (context) => FlutterLogo(),
+                        width: 15,
+                        height: 15,
+                        // builder: (context) => FlutterLogo(),
+                        // builder: (context) => Image.asset('assets/images/cat.png'),
+                        builder: (context) => GestureDetector(
+                          onTap: () {
+                            _showImageDialog(context,
+                                cat); // Chame a função para exibir o Dialog
+                          },
+                          child: Image.asset(
+                              'assets/images/cat.png'), // Substitua com o caminho para sua imagem
+                        ),
                       );
                     }).toList(),
                   ),
@@ -84,7 +94,7 @@ class _CatMapState extends State<CatMap> {
               );
             }
           }
-          return Text('Localização não disponível');
+          return const Text('Localização não disponível');
         },
       ),
     );
@@ -102,6 +112,7 @@ class _CatMapState extends State<CatMap> {
       print('Erro ao obter a posição: $e');
     }
   }
+
   Future<List<CatItem>> fetchCatList() async {
     //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
     final uri = Uri.parse("$API_URL/cat/paged");
@@ -117,9 +128,9 @@ class _CatMapState extends State<CatMap> {
         if (response.body != null && response.body.isNotEmpty) {
           final Map<String, dynamic> jsonBody = json.decode(response.body);
           final List<dynamic> catJsonList =
-          jsonBody['content'] as List<dynamic>;
+              jsonBody['content'] as List<dynamic>;
           final List<CatItem> catList =
-          catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+              catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
           setState(() {
             gatos = catList;
           });
@@ -140,5 +151,72 @@ class _CatMapState extends State<CatMap> {
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('userToken');
+  }
+
+  void _showImageDialog(BuildContext context, CatItem cat) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            cat.name!,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          content: Container(
+              height: 267,
+              width: 320,
+              child: Column(
+                children: [
+                  Container(
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 8,
+                            offset: Offset(4, 4),
+                            spreadRadius: 4// Shadow position
+                          ),
+                        ],
+                      ),
+                      height: 240,
+                      width: 240,
+                      child: ClipOval(
+                        child: SizedBox.fromSize(
+                          size: const Size.fromRadius(48), // Image radius
+                          child: Image.network(cat.image!, fit: BoxFit.cover),
+                        ),
+                      )),
+                  const SizedBox(height: 8),
+                  Text(cat.description!,
+                      softWrap: false,
+                      maxLines: 6,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black54)),
+                ],
+              )),
+          actions: <Widget>[
+            ElevatedButton(
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(const Color(0xFFFF9C51)),
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                    side: const BorderSide(width: 1, color: Color(0xFFE97F2E)),
+                  ))),
+              onPressed: () {
+                Navigator.of(context).pop(); // Fechar o Dialog
+              },
+              child: const Text('Fechar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
