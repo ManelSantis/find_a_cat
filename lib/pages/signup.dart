@@ -201,7 +201,7 @@ class _SignupState extends State<Signup> {
                       // side: BorderSide(width: 1, color: Color(0xFFE97F2E)),
                     ))),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => Signin(),

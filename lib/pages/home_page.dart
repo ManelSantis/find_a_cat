@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:find_a_cat/assets/constants.dart';
 import 'package:find_a_cat/firebase/storage.dart';
+import 'package:find_a_cat/models/user.dart';
 import 'package:flutter/material.dart';
 import '../data/cat_data.dart';
 import '../models/cat_item.dart';
@@ -31,12 +32,20 @@ class _HomePageState extends State<HomePage> {
   ImagePicker imagePicker = ImagePicker();
   File? imageFile;
   String pathImg = "";
+  User? loggedUser;
+
+  @override
+  void initState() {
+    super.initState();
+    // Chame sua função aqui
+    fetchUser();
+  }
 
   void addNewCat() {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text('Encontrei um novo gato'),
+              title: const Text('Encontrei um novo gato'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -45,13 +54,14 @@ class _HomePageState extends State<HomePage> {
                           imageFile!,
                           width: 100,
                           height: 100,
-                          fit: BoxFit.cover,
+                          // fit: BoxFit.cover,
+                          fit: BoxFit.fitWidth,
                         )
-                      : Icon(Icons.image),
-                  SizedBox(height: 20),
+                      : const Icon(Icons.image),
+                  const SizedBox(height: 20),
                   TextButton(
                     onPressed: _getFromCamera,
-                    child: Icon(Icons.add),
+                    child: const Icon(Icons.add),
                   ),
                   TextField(
                     controller: nameCat,
@@ -71,17 +81,18 @@ class _HomePageState extends State<HomePage> {
                 TextButton(
                     onPressed: cancel,
                     style: ButtonStyle(
-
                         shape:
-                        MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                              // side: const BorderSide(
-                              //     width: 0, color:  Color(0xFF058B9C)),
-                            ))),
+                            MaterialStateProperty.all<RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30.0),
+                      // side: const BorderSide(
+                      //     width: 0, color:  Color(0xFF058B9C)),
+                    ))),
                     child: const Text(
                       'Cancelar',
-                      style: TextStyle(fontWeight: FontWeight.w600,color: Color(0xFF058B9C)),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF058B9C)),
                     )),
                 ElevatedButton(
                     style: ButtonStyle(
@@ -95,7 +106,7 @@ class _HomePageState extends State<HomePage> {
                               width: 1, color: Color(0xFFE97F2E)),
                         ))),
                     onPressed: save,
-                    child: Text('Adicionar')),
+                    child: const Text('Adicionar')),
               ],
             ));
   }
@@ -139,6 +150,30 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<CatData>(
       builder: (context, value, child) => Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          toolbarHeight: 72,
+          title:  Row(
+            children: [
+              Column(
+                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text("${loggedUser?.name }",style:const TextStyle(fontWeight: FontWeight.w600),),
+                  Text("${loggedUser?.username}",style:const TextStyle(fontSize: 14,fontWeight: FontWeight.w400),)
+                ],
+              ),
+            ],
+          ),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: <Color>[Color(0xFFE97F2E), Color(0xFFFF9C51)]),
+            ),
+          ),
+        ),
         backgroundColor: Colors.grey[300],
         floatingActionButton: Row(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -176,37 +211,108 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        body: FutureBuilder<List<CatItem>>(
-          future: fetchCatList(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator(); // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
-            } else if (snapshot.hasError) {
-              return Text('Erro: ${snapshot.error}');
-            } else if (!snapshot.hasData) {
-              return Text('Nenhum dado disponível');
-            } else {
-              final catList = snapshot.data!;
+        body: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+          child: FutureBuilder<List<CatItem>>(
+            future: fetchCatList(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator(); // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
+              } else if (snapshot.hasError) {
+                return Text('Erro: ${snapshot.error}');
+              } else if (!snapshot.hasData) {
+                return Text('Nenhum dado disponível');
+              } else {
+                final catList = snapshot.data!;
 
-              return ListView.builder(
-                itemCount: catList.length,
-                itemBuilder: (context, index) => ListTile(
-                  leading: Image.network(catList[index].image!),
-                  title: Text(
-                      '${catList[index].title} , ${value.convertDateTimeToString(catList[index].dateTime!)}'),
-                  // onTap: () async {
-                  //   late Widget page = CatDescription(index: index);
-                  //   String retorno = "";
-                  //   try {
-                  //     retorno = await push(context, page);
-                  //   } catch (error) {
-                  //     print(retorno);
-                  //   }
-                  // },
-                ),
-              );
-            }
-          },
+                return SingleChildScrollView(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: catList.length,
+                    itemBuilder: (context, index) => Container(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "${catList[index].user!.name}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 16),
+                                  ),
+                                  Text(
+                                    value.convertDateTimeToString(
+                                        catList[index].dateTime!),
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.normal,
+                                        fontSize: 14,
+                                        color: Colors.black45),
+                                  )
+                                ]),
+                          ),
+                          Image.network(catList[index].image!),
+                          Row(children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
+                              child: Text(
+                                '${catList[index].title}',
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black45),
+                              ),
+                            ),
+                          ]
+                              // onTap: () async {
+                              //   late Widget page = CatDescription(index: index);
+                              //   String retorno = "";
+                              //   try {
+                              //     retorno = await push(context, page);
+                              //   } catch (error) {
+                              //     print(retorno);
+                              //   }
+                              // },
+                              ),
+                          Row(children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
+                              child: Text(
+                                '${catList[index].name}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ]),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${catList[index].description}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          const Divider()
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -215,8 +321,8 @@ class _HomePageState extends State<HomePage> {
   void _getFromCamera() async {
     XFile? pickedFile = await ImagePicker().pickImage(
         source: ImageSource.camera,
-        maxWidth: 360,
-        maxHeight: 360,
+        maxWidth: 300,
+        maxHeight: 300,
         imageQuality: 50,
         preferredCameraDevice: CameraDevice.front);
 
@@ -378,5 +484,31 @@ class _HomePageState extends State<HomePage> {
     String base64string =
         base64.encode(imagebytes); //convert bytes to base64 string
     print(base64string);
+  }
+
+  Future<User?> fetchUser() async {
+    //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+    final token = await getToken();
+    final username = await getUsername();
+    //final userUri = Uri.parse("http://192.168.1.5:8080/user/username/$username");
+    final userUri = Uri.parse("$API_URL/user/username/$username");
+    final responseUser = await http.get(userUri, headers: {
+      'content-type': "application/json",
+      'authorization': "Bearer $token"
+    });
+    if (responseUser.statusCode == 200) {
+      final userData = json.decode(responseUser.body);
+      final Map<String, dynamic> request = {
+        'id': userData['id'],
+        'name': userData['name'],
+        'username': userData['username'],
+        'email': userData['email']
+      };
+      User u = User.fromJson(request);
+      setState(() {
+        loggedUser = u;
+      });
+      return u;
+    }
   }
 }
