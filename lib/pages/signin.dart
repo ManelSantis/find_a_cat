@@ -117,12 +117,13 @@ class _SigninState extends State<Signin> {
                         login(usernameUser.text, passwordUser.text).then((value) {
                           token = value;
                           if (token != null) {
-                            saveToken(token!, usernameUser.text);
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => HomePage(),
-                                ));
+                            saveToken(token!, usernameUser.text).then((value) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomePage(),
+                                  ));
+                            });
                           } else {
                             showError = true;
                           }

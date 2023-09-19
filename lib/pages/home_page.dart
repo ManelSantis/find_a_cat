@@ -18,6 +18,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'signin.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -48,16 +50,12 @@ class _HomePageState extends State<HomePage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  imageFile != null
-                      ? Image.file(
-                          imageFile!,
-                          width: 100,
-                          height: 100,
-                          // fit: BoxFit.cover,
-                          fit: BoxFit.fitWidth,
-                        )
-                      : const Icon(Icons.image),
-                  const SizedBox(height: 20),
+                  imageFile != null ? Image.file(
+                      File(pathImg),
+                      width: 120.0,
+                      height: 120.0,
+                      fit: BoxFit.cover
+                  ) : const Icon(Icons.image),
                   TextButton(
                     onPressed: _getFromCamera,
                     child: const Icon(Icons.add),
@@ -119,7 +117,6 @@ class _HomePageState extends State<HomePage> {
             titleCat.text,
             descriptionCat.text,
             DateTime.now(),
-            123,
             location.latitude,
             location.longitude);
 
@@ -149,6 +146,32 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<CatData>(
       builder: (context, value, child) => Scaffold(
+        endDrawer: Drawer(
+          child: ListView(
+            children: [
+              ListTile(
+                title: Text(loggedUser?.name ?? ''),
+              ),
+              ListTile(
+                title: Text(loggedUser?.username ?? ''),
+              ),
+              ListTile(
+                title: Text(loggedUser?.email ?? ''),
+              ),
+              ListTile(
+                title: Text('Sair'),
+                onTap: () {
+                  logout();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Signin(),
+                      ));
+                },
+              ),
+            ],
+          ),
+        ),
         appBar: AppBar(
           automaticallyImplyLeading: false,
           toolbarHeight: 72,
@@ -174,15 +197,9 @@ class _HomePageState extends State<HomePage> {
                       overflow: TextOverflow.ellipsis)
                 ],
               ),
-              IconButton(
-                iconSize: 40,
-                icon: const Icon(Icons.account_circle),
-                onPressed: () {
-                  // ...
-                },
-              ),
             ],
           ),
+
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -358,6 +375,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
+
     );
   }
 
@@ -371,8 +389,11 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       imageFile = File(pickedFile!.path);
-      //pathImg = pickedFile!.path;
+      pathImg = pickedFile?.path ?? "";
     });
+
+    Navigator.pop(context);
+    addNewCat();
     // if (imageFile != null) {
     //   String? imageLink = await StorageClient()
     //       .uploadImageToFirebase(imageFile: imageFile!);
@@ -412,7 +433,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<CatItem> createCat(String name, String title, String description,
-      DateTime dateTime, int image, double latitude, double longitude) async {
+      DateTime dateTime, double latitude, double longitude) async {
     try {
       //final uri = Uri.parse("http://192.168.1.5:8080/cat/create");
       final uri = Uri.parse("$API_URL/cat/create");
@@ -492,10 +513,15 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         if (response.body != null && response.body.isNotEmpty) {
           final Map<String, dynamic> jsonBody = json.decode(response.body);
+
           final List<dynamic> catJsonList =
               jsonBody['content'] as List<dynamic>;
           final List<CatItem> catList =
               catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+
+          catList.sort((a, b) =>
+            b.dateTime!.compareTo(a.dateTime!)
+          );
 
           return catList;
         } else {
@@ -503,6 +529,63 @@ class _HomePageState extends State<HomePage> {
         }
       } else {
         throw Exception('Falha ao buscar a lista de gatos');
+      }
+    } catch (e, stackTrace) {
+      print('Erro: $e');
+      print('Stack Trace: $stackTrace');
+      throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
+    }
+  }
+
+  Future<List<CatItem>> fetchMyCatList() async {
+    //final uri = Uri.parse("http:/192.168.1.5:8080/cat/paged");
+    final uri = Uri.parse("$API_URL/cat/paged");
+
+    try {
+      final token = await getToken();
+      final response = await http.get(uri, headers: {
+        'content-type': "application/json",
+        'authorization': "Bearer $token",
+      });
+
+      if (response.statusCode == 200) {
+        if (response.body != null && response.body.isNotEmpty) {
+          final Map<String, dynamic> jsonBody = json.decode(response.body);
+
+          final List<dynamic> catJsonList =
+          jsonBody['content'] as List<dynamic>;
+          final List<CatItem> catList =
+          catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+          catList.removeWhere((cat) => cat.user!.id != loggedUser!.id);
+
+          return catList;
+        } else {
+          throw Exception('Empty response body');
+        }
+      } else {
+        throw Exception('Falha ao buscar a lista de gatos');
+      }
+    } catch (e, stackTrace) {
+      print('Erro: $e');
+      print('Stack Trace: $stackTrace');
+      throw e; // Rethrow a exceção para que o chamador saiba que algo deu errado
+    }
+  }
+
+  Future<void> deleteCat(String id) async {
+    final uri = Uri.parse("$API_URL/cat/$id");
+
+    try {
+      final token = await getToken();
+      final response = await http.delete(uri, headers: {
+        'content-type': "application/json",
+        'authorization': "Bearer $token",
+      });
+
+      if (response.statusCode == 204) {
+        print("Gato deletado com sucesso");
+      } else {
+        throw Exception('Falha deletar gato');
       }
     } catch (e, stackTrace) {
       print('Erro: $e');
@@ -554,4 +637,11 @@ class _HomePageState extends State<HomePage> {
       return u;
     }
   }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('userToken');
+    await prefs.remove('username');
+  }
+
 }
