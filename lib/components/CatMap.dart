@@ -170,7 +170,7 @@ class _CatMapState extends State<CatMap> {
                 children: [
                   Container(
                       decoration: const BoxDecoration(
-                        color: Colors.red,
+                        color: Colors.grey,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(

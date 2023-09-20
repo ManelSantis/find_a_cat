@@ -49,30 +49,33 @@ class _HomePageState extends State<HomePage> {
         context: context,
         builder: (context) => AlertDialog(
               title: const Text('Encontrei um novo gato'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  imageFile != null
-                      ? Image.file(File(pathImg),
-                          width: 120.0, height: 120.0, fit: BoxFit.cover)
-                      : const Icon(Icons.image),
-                  TextButton(
-                    onPressed: _getFromCamera,
-                    child: const Icon(Icons.add),
-                  ),
-                  TextField(
-                    controller: nameCat,
-                    decoration: const InputDecoration(hintText: 'Nome'),
-                  ),
-                  TextField(
-                    controller: titleCat,
-                    decoration: const InputDecoration(hintText: 'Título'),
-                  ),
-                  TextField(
-                    controller: descriptionCat,
-                    decoration: const InputDecoration(hintText: 'Descrição'),
-                  ),
-                ],
+              content: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    imageFile != null
+                        ? Image.file(File(pathImg),
+                            width: 120.0, height: 120.0, fit: BoxFit.cover)
+                        : const Icon(Icons.image),
+                    TextButton(
+                      onPressed: _getFromCamera,
+                      child: const Icon(Icons.add),
+                    ),
+                    TextField(
+                      controller: nameCat,
+                      decoration: const InputDecoration(hintText: 'Nome'),
+                    ),
+                    TextField(
+                      controller: titleCat,
+                      decoration: const InputDecoration(hintText: 'Título'),
+                    ),
+                    TextField(
+                      controller: descriptionCat,
+                      decoration: const InputDecoration(hintText: 'Descrição'),
+                    ),
+                  ],
+                ),
               ),
               actions: [
                 TextButton(

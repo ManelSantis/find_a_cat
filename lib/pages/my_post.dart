@@ -182,6 +182,14 @@ class _MyPostState extends State<MyPost> {
                                               MainAxisAlignment.center,
                                           children: <Widget>[
                                             const Text(
+                                              "Atenção",
+                                              style: TextStyle(
+                                                  color: Colors.deepOrange,
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600),
+                                            ),
+                                            const SizedBox(height: 20,),
+                                            const Text(
                                               'Tem certeza que deseja deletar seu post? '
                                               'esta operação é PERMANENTE!!!.',
                                               softWrap: false,
@@ -202,7 +210,8 @@ class _MyPostState extends State<MyPost> {
                                                     Navigator.pushReplacement(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) => MyPost(),
+                                                          builder: (context) =>
+                                                              MyPost(),
                                                         ));
                                                   },
                                                   child: const Text(
