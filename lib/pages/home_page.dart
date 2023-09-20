@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:find_a_cat/assets/constants.dart';
 import 'package:find_a_cat/firebase/storage.dart';
 import 'package:find_a_cat/models/user.dart';
+import 'package:find_a_cat/pages/my_post.dart';
 import 'package:flutter/material.dart';
 import '../data/cat_data.dart';
 import '../models/cat_item.dart';
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
     // Chame sua função aqui
     fetchUser();
   }
+
   void addNewCat() {
     showDialog(
         context: context,
@@ -50,12 +52,10 @@ class _HomePageState extends State<HomePage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  imageFile != null ? Image.file(
-                      File(pathImg),
-                      width: 120.0,
-                      height: 120.0,
-                      fit: BoxFit.cover
-                  ) : const Icon(Icons.image),
+                  imageFile != null
+                      ? Image.file(File(pathImg),
+                          width: 120.0, height: 120.0, fit: BoxFit.cover)
+                      : const Icon(Icons.image),
                   TextButton(
                     onPressed: _getFromCamera,
                     child: const Icon(Icons.add),
@@ -159,6 +159,26 @@ class _HomePageState extends State<HomePage> {
                 title: Text(loggedUser?.email ?? ''),
               ),
               ListTile(
+                title: Text('Atualizar Página'),
+                onTap: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(),
+                      ));
+                },
+              ),
+              ListTile(
+                title: Text('Meus Gatos'),
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyPost(),
+                      ));
+                },
+              ),
+              ListTile(
                 title: Text('Sair'),
                 onTap: () {
                   logout();
@@ -199,7 +219,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-
           flexibleSpace: Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -276,8 +295,13 @@ class _HomePageState extends State<HomePage> {
                                   Row(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-                                        child: Icon(Icons.account_circle,size: 40, color:Colors.grey,),
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 0, 4, 0),
+                                        child: Icon(
+                                          Icons.account_circle,
+                                          size: 40,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                       Text(
                                         "${catList[index].user!.name}",
@@ -375,7 +399,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-
     );
   }
 
@@ -519,9 +542,7 @@ class _HomePageState extends State<HomePage> {
           final List<CatItem> catList =
               catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
 
-          catList.sort((a, b) =>
-            b.dateTime!.compareTo(a.dateTime!)
-          );
+          catList.sort((a, b) => b.dateTime!.compareTo(a.dateTime!));
 
           return catList;
         } else {
@@ -553,9 +574,9 @@ class _HomePageState extends State<HomePage> {
           final Map<String, dynamic> jsonBody = json.decode(response.body);
 
           final List<dynamic> catJsonList =
-          jsonBody['content'] as List<dynamic>;
+              jsonBody['content'] as List<dynamic>;
           final List<CatItem> catList =
-          catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
+              catJsonList.map((catJson) => CatItem.fromJson(catJson)).toList();
           catList.removeWhere((cat) => cat.user!.id != loggedUser!.id);
 
           return catList;
@@ -643,5 +664,4 @@ class _HomePageState extends State<HomePage> {
     await prefs.remove('userToken');
     await prefs.remove('username');
   }
-
 }
