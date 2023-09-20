@@ -164,7 +164,7 @@ class _CatMapState extends State<CatMap> {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           content: Container(
-              height: 267,
+              height: 300,
               width: 320,
               child: Column(
                 children: [
@@ -192,7 +192,7 @@ class _CatMapState extends State<CatMap> {
                   const SizedBox(height: 8),
                   Text(cat.description!,
                       softWrap: false,
-                      maxLines: 6,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                           fontSize: 16,
